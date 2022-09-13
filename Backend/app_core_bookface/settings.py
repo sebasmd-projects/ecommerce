@@ -15,6 +15,9 @@ environment = f"{obtener_valor('ENVIRONMENT')}"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = obtener_valor('SECRET_KEY')
 
+# Trabajar con otro modelo para el usuario
+AUTH_USER_MODEL = 'authentication.ModeloPersonas'
+
 # URL Global
 BASE_URL = obtener_valor('BASE_URL')
 
@@ -57,7 +60,7 @@ THIRD_PARTY_APPS = (
 
 # Apps locales
 LOCAL_APPS = (
-    
+    'apps.authentication',
 )
 
 # Unir apps de terceros, locales y de Django
@@ -66,6 +69,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -100,13 +104,13 @@ WSGI_APPLICATION = 'app_core_bookface.wsgi.application'
 
 DATABASES = {
     'default': {
-        'CONN_MAX_AGE': obtener_valor('CONN_MAX_AGE'),
-        'ENGINE': obtener_valor('ENGINE'),
-        'NAME': obtener_valor('NAME'),
-        'USER': obtener_valor('USER'),
-        'PASSWORD': obtener_valor('PASSWORD'),
-        'HOST': obtener_valor('HOST'),
-        'PORT': obtener_valor('PORT')
+        'CONN_MAX_AGE': obtener_valor('DB_CONN_MAX_AGE'),
+        'ENGINE': obtener_valor('DB_ENGINE'),
+        'NAME': obtener_valor('DB_NAME'),
+        'USER': obtener_valor('DB_USER'),
+        'PASSWORD': obtener_valor('DB_PASSWORD'),
+        'HOST': obtener_valor('DB_HOST'),
+        'PORT': obtener_valor('DB_PORT')
     }
 }
 
@@ -145,9 +149,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = ['public/static',]
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'public/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -156,6 +162,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Configuración de correo
+if bool(obtener_valor('EMAIL_USE_TLS')) == True:
+    EMAIL_USE_TLS = True
+else:
+    EMAIL_USE_SSL = True
 EMAIL_HOST = obtener_valor('EMAIL_HOST')
 EMAIL_PORT = obtener_valor('EMAIL_PORT')
 EMAIL_HOST_USER = obtener_valor('EMAIL_HOST_USER')
